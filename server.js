@@ -73,6 +73,16 @@ function logRequest(req) {
   console.log(`${colors.bright}${colors.cyan}======================================================${colors.reset}\n`);
 }
 
+// Health check endpoint for Docker
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    service: 'webhook-tester'
+  });
+});
+
 // Catch-all route for all HTTP methods and paths
 app.all('*', (req, res) => {
   // Log the request details
@@ -90,12 +100,13 @@ app.all('*', (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`${colors.bright}${colors.green}🚀 Webhook Tester Server is running!${colors.reset}`);
   console.log(`${colors.yellow}📡 Listening on port: ${colors.bright}${PORT}${colors.reset}`);
-  console.log(`${colors.blue}🔗 Server URL: ${colors.bright}http://localhost:${PORT}${colors.reset}`);
+  console.log(`${colors.blue}🔗 Server URL: ${colors.bright}http://0.0.0.0:${PORT}${colors.reset}`);
   console.log(`${colors.magenta}📝 Ready to capture webhooks on any path and method!${colors.reset}`);
-  console.log(`${colors.cyan}💡 Try (PowerShell): $body = '{"test": "data"}'; Invoke-WebRequest -Uri "http://localhost:${PORT}/webhook" -Method POST -Body $body -ContentType "application/json"${colors.reset}\n`);
+  console.log(`${colors.cyan}💡 Try (PowerShell): $body = '{"test": "data"}'; Invoke-WebRequest -Uri "http://localhost:${PORT}/webhook" -Method POST -Body $body -ContentType "application/json"${colors.reset}`);
+  console.log(`${colors.white}🏥 Health check available at: http://localhost:${PORT}/health${colors.reset}\n`);
 });
 
 // Graceful shutdown
